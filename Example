@@ -1,0 +1,102 @@
+<?php
+session_start();
+ include('sql.php'); 
+
+if(isset($_POST['submit'])){
+
+	if(isset($_POST['g-recaptcha-response'])){
+
+		require('recaptcha/autoload.php');
+		$recaptcha = new \ReCaptcha\ReCaptcha('6LfhSRYUAAAAAPvSQv2z-IrHT3WUQvDI9Wg9r3cq');
+		$resp = $recaptcha->verify($_POST['g-recaptcha-response']);
+		if ($resp->isSuccess()) {
+	    	
+		} else {
+		    $errors = $resp->getErrorCodes();   
+		}
+	}else{
+		
+	}
+}
+	
+?>
+
+<?php
+	
+	
+	if(isset($_POST['submit1'])){
+		include("classnorme.php");
+		include("algorithemcrypte.php");
+
+		?><div id="code_php_first"><?php
+		$id_detudiant=htmlentities(trim($_POST['id_detudiant']));
+		$numero_decole=htmlentities(trim($_POST['numero_decole']));
+		$cpt2=0;
+		if($id_detudiant&&$numero_decole){
+			$reponse2=$conn->query("SELECT * FROM etudiant");
+
+				if($id_detudiant=='admin' && $numero_decole=='admin')
+				{
+					header("Location:Page_Login/login.php");
+				}else
+				{
+					while($donnes2=$reponse2->fetch()){
+
+							 $nom_etudiant=$donnes2['nom'];
+							 $prenom_etudiant=$donnes2['prenom'];
+
+							 /*$key=serrure($nom_etudiant);
+							 $key2=serrure($prenom_etudiant);
+
+							 $id_dupaye=encrypt($id_detudiant,$key);
+							 $numero_decole_dec=encrypt($numero_decole,$key2);*/
+							 if($donnes2['id_dupaye']==$id_detudiant&&$donnes2['numero_ecole']==$numero_decole){
+								$cpt2++;
+								$_SESSION['id']=$donnes2['id'];
+							}
+
+						}
+						if($cpt2==1){
+							header('Location:Control/control_etudiant.php');
+						}else{
+							echo"Desole Votre mot de passe ou votre numero d'ecole est incorrect";
+						}
+				}
+						
+		}else echo"Veuillez saisir tous les champs";
+		?>
+		</div>
+		<?php
+	}
+	else if(isset($_POST['submit2']))
+	{
+		?><div id="code_php_seconde"><?php
+		$cpt=0;
+		$id_dupaye=htmlentities(trim($_POST['id_dupaye']));
+		$user_name=htmlentities(trim($_POST['user_name']));
+		$password=htmlentities(trim($_POST['password']));
+
+		if($id_dupaye&&$user_name&&$password){
+
+				$reponse=$conn->query("SELECT * FROM professeur");
+
+						while($donnes=$reponse->fetch()){
+
+							 if($donnes['id_dupaye']==$id_dupaye&&$donnes['user_name']==$user_name&&$donnes['password']==$password){
+								$cpt++;
+								$_SESSION['id']=$donnes['id'];
+							}
+						}
+						if($cpt==1){
+							header('Location:Proffesseur/Professeur.php');
+
+						}else{
+							echo"Desole Votre mot de passe ou votre email est incorrect";
+						}
+		}else echo"Veuillez saisir tous les champs";
+		?>
+		</div>
+		<?php
+	}
+
+?>
